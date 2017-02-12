@@ -17,6 +17,8 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
 
         internal MqttClient(string host, int port, string clientId)
         {
+            this.handlers = new Dictionary<string, MqttMessageHandler>();
+
             this.client = new uPLibrary.Networking.M2Mqtt.MqttClient(host);
             this.client.Connect(clientId);
 

@@ -1,10 +1,10 @@
 var target = Argument("target", "Default");
-var configuration = Argument("buildconfiguration", "Release");
-var source = Argument("buildsource", "Z:/NuGet");
+var configuration = Argument("configuration", "Debug");
+var nugetsource = "http://192.168.1.100:81/nuget/Default/";
 var packages = "./packages";
 var artifacts = "./artifacts/";
-var solution = "./MqttBridge.sln";
-var project = "./MqttBridge/MqttBridge.csproj";
+var projectpath = "./MqttBridge/";
+var project = projectpath + "MqttBridge.csproj";
 
 var nugetRestoreSettings = new NuGetRestoreSettings
 	{
@@ -18,12 +18,14 @@ var nugetUpdateSettings = new NuGetUpdateSettings
 var nugetPackSettings = new NuGetPackSettings
 	{
 		OutputDirectory = artifacts,
+		Symbols = true,
 		Properties = new Dictionary<string, string>{{"Configuration", configuration}}
 	};
 
 var nugetPushSettings = new NuGetPushSettings
 	{
-		Source = source
+		Source = nugetsource,
+		ApiKey = "Development:Development"
 	};
 
 var msbuildSettings = new MSBuildSettings 
@@ -44,14 +46,20 @@ Task("Restore")
 	.IsDependentOn("Clean")
 	.Does(() => 
 {
-	NuGetRestore(project, nugetRestoreSettings);
+	if(FileExists(projectpath + "packages.config"))
+	{
+		NuGetRestore(project, nugetRestoreSettings);
+	}
 });
 
 Task("Update")
 	.IsDependentOn("Restore")
 	.Does(() =>
 {
-	NuGetUpdate(project, nugetUpdateSettings);
+	if(FileExists(projectpath + "packages.config"))
+	{
+		NuGetUpdate(project, nugetUpdateSettings);
+	}
 });
 
 Task("Build")
@@ -74,9 +82,8 @@ Task("Push")
 	.IsDependentOn("Package")
 	.Does(() =>
 {
-	var nupkgs = GetFiles(System.IO.Path.Combine(artifacts, "*.nupkg"));
-
-	NuGetPush(nupkgs, nugetPushSettings);
+	var symbolpkg = GetFiles(System.IO.Path.Combine(artifacts, "*.symbols.nupkg"));
+	NuGetPush(symbolpkg, nugetPushSettings);
 });
 
 Task("Default").IsDependentOn("Build");

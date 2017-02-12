@@ -13,7 +13,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
         TwoWay
     }
 
-    public interface IMqttBindingConfiguration
+    public interface IMqttBindingConfiguration : Configuration.Identifier
     {
         string Channel { get; set; }
         string ObjectId { get; set; }
