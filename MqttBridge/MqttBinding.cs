@@ -23,6 +23,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
 
         public MqttBinding(MqttClient client, Channel channel, string objectId, string propertyName, string topic, BindingMode mode)
         {
+            this.client = client;
             this.obj = channel.Find(objectId);
             this.propertyName = propertyName;
             this.topic = topic;
