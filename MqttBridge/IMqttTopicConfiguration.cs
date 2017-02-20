@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Skogsaas.Monolith.Plugins.MqttBridge
 {
-    public interface IMqttClientConfiguration : Configuration.IIdentifier
+    public interface IMqttTopicConfiguration : Configuration.IIdentifier
     {
-        string Broker { get; set; }
-        int Port { get; set; }
-
-        string ClientId { get; set; }
+        string Topic { get; set; }
+        byte Qos { get; set; }
+        bool Retain { get; set; } 
     }
 }

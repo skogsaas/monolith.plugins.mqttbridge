@@ -8,18 +8,18 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
         private Channel configChannel;
         private MqttClient client;
 
-        private Dictionary<string, MqttBinding> bindings;
+        private Dictionary<string, MqttTopicHandler> topics;
 
         public MqttBridge()
         {
-            this.bindings = new Dictionary<string, MqttBinding>();
+            this.topics = new Dictionary<string, MqttTopicHandler>();
         }
 
         public void initialize()
         {
             this.configChannel = Manager.Create(Configuration.Constants.Channel);
             this.configChannel.RegisterType(typeof(IMqttClientConfiguration));
-            this.configChannel.RegisterType(typeof(IMqttBindingConfiguration));
+            this.configChannel.RegisterType(typeof(IMqttTopicConfiguration));
 
             this.configChannel.SubscribePublish(typeof(IMqttClientConfiguration), onClientConfigPublish);
         }
@@ -30,15 +30,18 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
 
             this.client = new MqttClient(config.Broker, config.Port, config.ClientId);
 
-            this.configChannel.SubscribePublish(typeof(IMqttBindingConfiguration), onBindingConfigPublish);
+            this.configChannel.SubscribePublish(typeof(IMqttTopicConfiguration), onBindingConfigPublish);
         }
 
         private void onBindingConfigPublish(Channel channel, IObject obj)
         {
-            IMqttBindingConfiguration config = obj as IMqttBindingConfiguration;
+            IMqttTopicConfiguration config = obj as IMqttTopicConfiguration;
 
-            MqttBinding binding = new MqttBinding(this.client, Manager.Create(config.Channel), config.ObjectId, config.PropertyName, config.Topic, config.Mode);
-            this.bindings.Add(config.Topic, binding);
+            IMqttTopic topic = this.configChannel.CreateType<IMqttTopic>($"{typeof(IMqttTopic).FullName}.{config.Topic.Replace('/', '.')}");
+            this.configChannel.Publish(topic);
+
+            MqttTopicHandler binding = new MqttTopicHandler(this.client, topic, config);
+            this.topics.Add(config.Topic, binding);
         }
     }
 }
