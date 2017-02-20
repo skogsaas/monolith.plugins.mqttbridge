@@ -41,6 +41,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
             IMqttTopicConfiguration config = obj as IMqttTopicConfiguration;
 
             IMqttTopic topic = this.configChannel.CreateType<IMqttTopic>($"{typeof(IMqttTopic).FullName}.{config.Topic.Replace('/', '.')}");
+            topic.Topic = config.Topic;
             this.dataChannel.Publish(topic);
 
             MqttTopicHandler binding = new MqttTopicHandler(this.client, topic, config);
