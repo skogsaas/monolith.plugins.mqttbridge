@@ -6,6 +6,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
     public class MqttBridge : IPlugin
     {
         private Channel configChannel;
+        private Channel dataChannel;
         private MqttClient client;
 
         private Dictionary<string, MqttTopicHandler> topics;
@@ -18,6 +19,8 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
         public void initialize()
         {
             this.configChannel = Manager.Create(Configuration.Constants.Channel);
+            this.dataChannel = Manager.Create(Data.Constants.Channel);
+
             this.configChannel.RegisterType(typeof(IMqttClientConfiguration));
             this.configChannel.RegisterType(typeof(IMqttTopicConfiguration));
 
@@ -38,7 +41,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
             IMqttTopicConfiguration config = obj as IMqttTopicConfiguration;
 
             IMqttTopic topic = this.configChannel.CreateType<IMqttTopic>($"{typeof(IMqttTopic).FullName}.{config.Topic.Replace('/', '.')}");
-            this.configChannel.Publish(topic);
+            this.dataChannel.Publish(topic);
 
             MqttTopicHandler binding = new MqttTopicHandler(this.client, topic, config);
             this.topics.Add(config.Topic, binding);
