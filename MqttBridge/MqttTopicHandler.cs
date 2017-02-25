@@ -23,6 +23,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
             this.config = config;
 
             this.topic.PropertyChanged += onPropertyChanged;
+            this.client.Subscribe(this.config.Topic, onMqttPublish);
         }
 
         private void onPropertyChanged(object sender, PropertyChangedEventArgs e)

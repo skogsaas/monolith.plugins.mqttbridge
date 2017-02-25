@@ -40,7 +40,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
         {
             IMqttTopicConfiguration config = obj as IMqttTopicConfiguration;
 
-            IMqttTopic topic = this.configChannel.CreateType<IMqttTopic>($"{typeof(IMqttTopic).FullName}.{config.Topic.Replace('/', '.')}");
+            IMqttTopic topic = this.dataChannel.CreateType<IMqttTopic>($"{typeof(IMqttTopic).FullName}.{config.Topic.Replace('/', '.')}");
             topic.Topic = config.Topic;
             this.dataChannel.Publish(topic);
 
