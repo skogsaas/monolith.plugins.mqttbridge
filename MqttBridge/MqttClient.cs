@@ -37,21 +37,24 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
         {
             if(this.handlers.ContainsKey(e.Topic))
             {
+                Logger.Trace($"Received from <{e.Topic}> ");
                 this.handlers[e.Topic](e.Topic, Encoding.UTF8.GetString(e.Message), e.QosLevel, e.Retain);
             }
             else
             {
-                Logging.Logger.Info($"Received MQTT from unknown topic <{e.Topic}> message <{Encoding.UTF8.GetString(e.Message)}>");
+                Logger.Info($"Received MQTT from unknown topic <{e.Topic}> message <{Encoding.UTF8.GetString(e.Message)}>");
             }
         }
 
         internal void Publish(string topic, string message, byte qos = 1, bool retain = false)
         {
+            Logger.Trace($"Publishing topic <{topic}> message <{message}>");
             this.client.Publish(topic, Encoding.UTF8.GetBytes(message), qos, retain);
         }
 
         internal void Subscribe(string topic, MqttMessageHandler handler)
         {
+            Logger.Trace($"Subscribing topic <{topic}>");
             this.client.Subscribe(new string[] { topic }, new byte[] { 1 });
 
             this.handlers[topic] = handler;
