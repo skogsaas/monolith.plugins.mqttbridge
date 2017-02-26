@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Skogsaas.Monolith.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -22,14 +23,14 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
             this.client = new uPLibrary.Networking.M2Mqtt.MqttClient(host);
             this.client.ConnectionClosed += onConnectionClosed;
 
-            this.client.Connect(clientId);
+            Logger.Info($"Trying to connect <{this.client.Connect(clientId)}>.");
 
             this.client.MqttMsgPublishReceived += onMqttMsgPublishReceived;
         }
 
         private void onConnectionClosed(object sender, EventArgs e)
         {
-            this.client.Connect(this.client.ClientId);
+            Logger.Info($"Connection closed. Trying to reconnect <{this.client.Connect(this.client.ClientId)}>.");
         }
 
         private void onMqttMsgPublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.MqttMsgPublishEventArgs e)
