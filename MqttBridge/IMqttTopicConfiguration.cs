@@ -9,6 +9,7 @@ namespace Skogsaas.Monolith.Plugins.MqttBridge
     public interface IMqttTopicConfiguration : Configuration.IIdentifier
     {
         string Topic { get; set; }
+        bool Subscribe { get; set; }
         byte Qos { get; set; }
         bool Retain { get; set; } 
     }
